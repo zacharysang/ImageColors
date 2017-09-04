@@ -1,9 +1,9 @@
 {
   "paragraphs": [
     {
-      "text": "import javax.imageio.ImageIO\nimport java.io.File",
+      "text": "import javax.imageio.ImageIO\nimport java.io.File\nimport org.apache.spark.sql._\nimport org.apache.spark.sql.types._ // required for making empty data frame\nimport org.apache.spark.rdd.RDD\nimport org.apache.spark.sql.SparkSession",
       "user": "anonymous",
-      "dateUpdated": "Sep 3, 2017 8:17:27 PM",
+      "dateUpdated": "Sep 4, 2017 10:27:28 AM",
       "config": {
         "colWidth": 12.0,
         "enabled": true,
@@ -22,7 +22,7 @@
         "msg": [
           {
             "type": "TEXT",
-            "data": "\nimport javax.imageio.ImageIO\n\nimport java.io.File\n"
+            "data": "\nimport javax.imageio.ImageIO\n\nimport java.io.File\n\nimport org.apache.spark.sql._\n\nimport org.apache.spark.sql.types._\n\nimport org.apache.spark.rdd.RDD\n"
           }
         ]
       },
@@ -30,15 +30,15 @@
       "jobName": "paragraph_1504377914918_-1497581428",
       "id": "20170902-144514_636278847",
       "dateCreated": "Sep 2, 2017 2:45:14 PM",
-      "dateStarted": "Sep 3, 2017 8:17:27 PM",
-      "dateFinished": "Sep 3, 2017 8:17:27 PM",
+      "dateStarted": "Sep 4, 2017 9:31:58 AM",
+      "dateFinished": "Sep 4, 2017 9:31:59 AM",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
-      "text": "val PATH \u003d \"file:///Users/zacha/Desktop/Projects/scripts/\"\n\nval FILE \u003d \"pic.jpg\"\n\nval imgFile \u003d new File(PATH + FILE)\n\nval imageBuff \u003d ImageIO.read(imgFile)\n\n",
+      "text": "val PATH \u003d File.separator + \"Users\" + File.separator + \"zacha\" + File.separator + \"Desktop\" + File.separator + \"Projects\" + File.separator + \"scripts\" + File.separator\nval FILE \u003d \"pic.jpg\"\ncase class Pixel(\n    r:Integer\n    , g:Integer\n    , b:Integer)\n\n// Takes a string for the path to an image \n// Returns a dataframe containing the values for each pixel in the image\n\ndef getPixelDS (path: String) : Dataset[Pixel] \u003d {\n        \n    //val retDS \u003d spark.emptyDataset[Pixel]\n    \n    val imgFile \u003d new File(path)\n    val imgBuff \u003d ImageIO.read(imgFile)\n    var pixels \u003d Seq[Pixel]()\n    \n    for (x \u003c- (0 until imgBuff.getWidth)) {\n        for(y \u003c- (0 until imgBuff.getHeight)) {\n            val RGB \u003d imgBuff.getRGB(x,y)\n            val red \u003d (RGB \u0026 0xff0000) / 65536\n            val green \u003d (RGB \u0026 0xff00) / 256\n            val blue \u003d (RGB \u0026 0xff)\n            val pixel \u003d new Pixel(red, green, blue)\n            pixels \u003d pixels :+ pixel\n        }\n    }\n    \n    return pixels.toDS()\n    \n}\n\nval data \u003d getPixelDS(PATH + FILE)\ndata.show()\n\n\n",
       "user": "anonymous",
-      "dateUpdated": "Sep 3, 2017 8:18:47 PM",
+      "dateUpdated": "Sep 4, 2017 3:57:46 PM",
       "config": {
         "colWidth": 12.0,
         "enabled": true,
@@ -62,11 +62,11 @@
         "forms": {}
       },
       "results": {
-        "code": "ERROR",
+        "code": "SUCCESS",
         "msg": [
           {
             "type": "TEXT",
-            "data": "\nPATH: String \u003d file:///Users/zacha/Desktop/Projects/scripts/\n\nFILE: String \u003d pic.jpg\n\nimgFile: java.io.File \u003d file:\\Users\\zacha\\Desktop\\Projects\\scripts\\pic.jpg\n\r\n\r\n\njavax.imageio.IIOException: Can\u0027t read input file!\r\n  at javax.imageio.ImageIO.read(Unknown Source)\r\n  ... 46 elided\n"
+            "data": "\nPATH: String \u003d \\Users\\zacha\\Desktop\\Projects\\scripts\\\n\nFILE: String \u003d pic.jpg\n\ndefined class Pixel\n\ngetPixelDS: (path: String)org.apache.spark.sql.Dataset[Pixel]\n\ndata: org.apache.spark.sql.Dataset[Pixel] \u003d [r: int, g: int ... 1 more field]\n+---+---+---+\n|  r|  g|  b|\n+---+---+---+\n+---+---+---+\n\r\n"
           }
         ]
       },
@@ -74,15 +74,15 @@
       "jobName": "paragraph_1504378661439_1163210626",
       "id": "20170902-145741_825067291",
       "dateCreated": "Sep 2, 2017 2:57:41 PM",
-      "dateStarted": "Sep 3, 2017 8:18:47 PM",
-      "dateFinished": "Sep 3, 2017 8:18:48 PM",
-      "status": "ERROR",
+      "dateStarted": "Sep 4, 2017 3:55:25 PM",
+      "dateFinished": "Sep 4, 2017 3:55:26 PM",
+      "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
-      "text": "",
+      "text": "var ints \u003d Seq[Int]()\n    ints \u003d ints :+ 1\nval intsDS \u003d ints.toDS\nintsDS.show()\n",
       "user": "anonymous",
-      "dateUpdated": "Sep 3, 2017 8:03:22 PM",
+      "dateUpdated": "Sep 4, 2017 3:56:59 PM",
       "config": {
         "colWidth": 12.0,
         "enabled": true,
@@ -96,10 +96,35 @@
         "params": {},
         "forms": {}
       },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\nints: Seq[Int] \u003d List()\n\nints: Seq[Int] \u003d List(1)\n\nintsDS: org.apache.spark.sql.Dataset[Int] \u003d [value: int]\n+-----+\n|value|\n+-----+\n|    1|\n+-----+\n\r\n"
+          }
+        ]
+      },
       "apps": [],
       "jobName": "paragraph_1504378895515_252431714",
       "id": "20170902-150135_861879847",
       "dateCreated": "Sep 2, 2017 3:01:35 PM",
+      "dateStarted": "Sep 4, 2017 3:56:59 PM",
+      "dateFinished": "Sep 4, 2017 3:57:00 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "user": "anonymous",
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1504554974265_1282417332",
+      "id": "20170904-155614_2001123738",
+      "dateCreated": "Sep 4, 2017 3:56:14 PM",
       "status": "READY",
       "progressUpdateIntervalMs": 500
     }
