@@ -1,0 +1,132 @@
+{
+  "paragraphs": [
+    {
+      "text": "import javax.imageio.ImageIO\nimport java.io.File",
+      "user": "anonymous",
+      "dateUpdated": "Sep 3, 2017 8:17:27 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\nimport javax.imageio.ImageIO\n\nimport java.io.File\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1504377914918_-1497581428",
+      "id": "20170902-144514_636278847",
+      "dateCreated": "Sep 2, 2017 2:45:14 PM",
+      "dateStarted": "Sep 3, 2017 8:17:27 PM",
+      "dateFinished": "Sep 3, 2017 8:17:27 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "val PATH \u003d \"file:///Users/zacha/Desktop/Projects/scripts/\"\n\nval FILE \u003d \"pic.jpg\"\n\nval imgFile \u003d new File(PATH + FILE)\n\nval imageBuff \u003d ImageIO.read(imgFile)\n\n",
+      "user": "anonymous",
+      "dateUpdated": "Sep 3, 2017 8:18:47 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "multiBarChart",
+              "height": 300.0,
+              "optionOpen": false
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "ERROR",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\nPATH: String \u003d file:///Users/zacha/Desktop/Projects/scripts/\n\nFILE: String \u003d pic.jpg\n\nimgFile: java.io.File \u003d file:\\Users\\zacha\\Desktop\\Projects\\scripts\\pic.jpg\n\r\n\r\n\njavax.imageio.IIOException: Can\u0027t read input file!\r\n  at javax.imageio.ImageIO.read(Unknown Source)\r\n  ... 46 elided\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1504378661439_1163210626",
+      "id": "20170902-145741_825067291",
+      "dateCreated": "Sep 2, 2017 2:57:41 PM",
+      "dateStarted": "Sep 3, 2017 8:18:47 PM",
+      "dateFinished": "Sep 3, 2017 8:18:48 PM",
+      "status": "ERROR",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "",
+      "user": "anonymous",
+      "dateUpdated": "Sep 3, 2017 8:03:22 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1504378895515_252431714",
+      "id": "20170902-150135_861879847",
+      "dateCreated": "Sep 2, 2017 3:01:35 PM",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "ImageColors",
+  "id": "2CUVUDE9A",
+  "angularObjects": {
+    "2CQJARFJR:shared_process": [],
+    "2CR3ZCVNZ:shared_process": [],
+    "2CTQA8H9H:shared_process": [],
+    "2CTS5188G:shared_process": [],
+    "2CSSBUMZT:shared_process": [],
+    "2CS12W3HZ:shared_process": [],
+    "2CSXE7HGH:shared_process": [],
+    "2CRB9NP2H:shared_process": [],
+    "2CSTGQ6B9:shared_process": [],
+    "2CUD8G98R:shared_process": [],
+    "2CQM5UGTD:shared_process": [],
+    "2CSWJSN22:shared_process": [],
+    "2CT7STJZ7:shared_process": [],
+    "2CU9FX6P7:shared_process": [],
+    "2CTVVTKWP:shared_process": [],
+    "2CTVENT69:shared_process": [],
+    "2CSDH5KJE:shared_process": [],
+    "2CTH8QUU8:shared_process": [],
+    "2CQQC6VXG:shared_process": []
+  },
+  "config": {},
+  "info": {}
+}
