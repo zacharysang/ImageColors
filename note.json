@@ -1,9 +1,9 @@
 {
   "paragraphs": [
     {
-      "text": "import javax.imageio.ImageIO\nimport java.io.File\nimport org.apache.spark.sql._\nimport org.apache.spark.sql.types._ // required for making empty data frame\nimport org.apache.spark.rdd.RDD\nimport org.apache.spark.sql.SparkSession",
+      "text": "import javax.imageio.ImageIO\nimport java.io.File\nimport org.apache.spark.sql._\nimport org.apache.spark.sql.types._\nimport org.apache.spark.rdd.RDD\nimport org.apache.spark.sql.SparkSession\nimport java.awt.image.DataBufferByte\nimport spark.implicits._",
       "user": "anonymous",
-      "dateUpdated": "Sep 4, 2017 10:27:28 AM",
+      "dateUpdated": "Sep 10, 2017 3:03:11 PM",
       "config": {
         "colWidth": 12.0,
         "enabled": true,
@@ -22,7 +22,7 @@
         "msg": [
           {
             "type": "TEXT",
-            "data": "\nimport javax.imageio.ImageIO\n\nimport java.io.File\n\nimport org.apache.spark.sql._\n\nimport org.apache.spark.sql.types._\n\nimport org.apache.spark.rdd.RDD\n"
+            "data": "\nimport javax.imageio.ImageIO\n\nimport java.io.File\n\nimport org.apache.spark.sql._\n\nimport org.apache.spark.sql.types._\n\nimport org.apache.spark.rdd.RDD\n\nimport org.apache.spark.sql.SparkSession\n\nimport java.awt.image.DataBufferByte\n\nimport spark.implicits._\n"
           }
         ]
       },
@@ -30,15 +30,15 @@
       "jobName": "paragraph_1504377914918_-1497581428",
       "id": "20170902-144514_636278847",
       "dateCreated": "Sep 2, 2017 2:45:14 PM",
-      "dateStarted": "Sep 4, 2017 9:31:58 AM",
-      "dateFinished": "Sep 4, 2017 9:31:59 AM",
+      "dateStarted": "Sep 10, 2017 3:03:11 PM",
+      "dateFinished": "Sep 10, 2017 3:03:31 PM",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
-      "text": "val PATH \u003d File.separator + \"Users\" + File.separator + \"zacha\" + File.separator + \"Desktop\" + File.separator + \"Projects\" + File.separator + \"scripts\" + File.separator\nval FILE \u003d \"pic.jpg\"\ncase class Pixel(\n    r:Integer\n    , g:Integer\n    , b:Integer)\n\n// Takes a string for the path to an image \n// Returns a dataframe containing the values for each pixel in the image\n\ndef getPixelDS (path: String) : Dataset[Pixel] \u003d {\n        \n    //val retDS \u003d spark.emptyDataset[Pixel]\n    \n    val imgFile \u003d new File(path)\n    val imgBuff \u003d ImageIO.read(imgFile)\n    var pixels \u003d Seq[Pixel]()\n    \n    for (x \u003c- (0 until imgBuff.getWidth)) {\n        for(y \u003c- (0 until imgBuff.getHeight)) {\n            val RGB \u003d imgBuff.getRGB(x,y)\n            val red \u003d (RGB \u0026 0xff0000) / 65536\n            val green \u003d (RGB \u0026 0xff00) / 256\n            val blue \u003d (RGB \u0026 0xff)\n            val pixel \u003d new Pixel(red, green, blue)\n            pixels \u003d pixels :+ pixel\n        }\n    }\n    \n    return pixels.toDS()\n    \n}\n\nval data \u003d getPixelDS(PATH + FILE)\ndata.show()\n\n\n",
+      "text": "/*\n Definition of constants and functions\n*/\n\nval PATH \u003d File.separator + \"Users\" + File.separator + \"zacha\" + File.separator + \"Desktop\" + File.separator + \"Projects\" + File.separator + \"scripts\" + File.separator\nval FILE \u003d \"pic.jpg\"\ncase class Pixel(\n    r:Integer\n    , g:Integer\n    , b:Integer)\n\n// Takes a string for the path to an image \n// Returns a dataframe containing the values for each pixel in the image\n\ndef getPixelDS (path: String) : Dataset[Pixel] \u003d {\n        \n    //val retDS \u003d spark.emptyDataset[Pixel]\n    \n    val imgFile \u003d new File(path)\n    val imgBuff \u003d ImageIO.read(imgFile)\n    val pixels \u003d (imgBuff.getRaster().getDataBuffer()).asInstanceOf[DataBufferByte].getData()\n    var pixelLength \u003d 0\n    if (imgBuff.getAlphaRaster() \u003d\u003d null) {\n        pixelLength \u003d 3\n    } else {\n        pixelLength \u003d 4\n    }\n    var pixelSeq \u003d Seq[Pixel]()\n    \n    if(pixelLength \u003d\u003d 3){\n        for (i \u003c- Range(0, imgBuff.getHeight() * imgBuff.getWidth(), pixelLength)) {\n            val red \u003d pixels( i )\n            val green \u003d pixels( i+1 )\n            val blue \u003d pixels( i+2 )\n            pixelSeq \u003d pixelSeq :+ Pixel(red, green, blue)\n        }\n    } else {\n        for (i \u003c- Range(0, imgBuff.getHeight() * imgBuff.getWidth(), pixelLength)) {\n            val red \u003d pixels( i+1 )\n            val green \u003d pixels( i+2 )\n            val blue \u003d pixels( i+3 )\n            pixelSeq \u003d pixelSeq :+ Pixel(red, green, blue)\n        }\n    }\n    \n    return pixelSeq.toDS()\n    \n}\n\ndef pixelToHex (col: Column) : Column \u003d {\n    return Integer.toHexString(pixel.r) + Integer.toHexString(pixel.g) + Integer.toHexString(pixel.b)\n}\n\n\n\n",
       "user": "anonymous",
-      "dateUpdated": "Sep 4, 2017 3:57:46 PM",
+      "dateUpdated": "Sep 10, 2017 4:09:53 PM",
       "config": {
         "colWidth": 12.0,
         "enabled": true,
@@ -46,7 +46,7 @@
           "0": {
             "graph": {
               "mode": "multiBarChart",
-              "height": 300.0,
+              "height": 298.95,
               "optionOpen": false
             },
             "helium": {}
@@ -66,7 +66,7 @@
         "msg": [
           {
             "type": "TEXT",
-            "data": "\nPATH: String \u003d \\Users\\zacha\\Desktop\\Projects\\scripts\\\n\nFILE: String \u003d pic.jpg\n\ndefined class Pixel\n\ngetPixelDS: (path: String)org.apache.spark.sql.Dataset[Pixel]\n\ndata: org.apache.spark.sql.Dataset[Pixel] \u003d [r: int, g: int ... 1 more field]\n+---+---+---+\n|  r|  g|  b|\n+---+---+---+\n+---+---+---+\n\r\n"
+            "data": "\nPATH: String \u003d \\Users\\zacha\\Desktop\\Projects\\scripts\\\n\nFILE: String \u003d pic.jpg\n\ndefined class Pixel\n\ngetPixelDS: (path: String)org.apache.spark.sql.Dataset[Pixel]\n\npixelToHex: (pixel: Pixel)String\n"
           }
         ]
       },
@@ -74,15 +74,15 @@
       "jobName": "paragraph_1504378661439_1163210626",
       "id": "20170902-145741_825067291",
       "dateCreated": "Sep 2, 2017 2:57:41 PM",
-      "dateStarted": "Sep 4, 2017 3:55:25 PM",
-      "dateFinished": "Sep 4, 2017 3:55:26 PM",
+      "dateStarted": "Sep 10, 2017 3:04:03 PM",
+      "dateFinished": "Sep 10, 2017 3:04:06 PM",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
     {
-      "text": "var ints \u003d Seq[Int]()\n    ints \u003d ints :+ 1\nval intsDS \u003d ints.toDS\nintsDS.show()\n",
+      "text": "// import the image and convert to a dataset\nval data \u003d getPixelDS(PATH + FILE)\ndata.show()",
       "user": "anonymous",
-      "dateUpdated": "Sep 4, 2017 3:56:59 PM",
+      "dateUpdated": "Sep 10, 2017 11:13:35 PM",
       "config": {
         "colWidth": 12.0,
         "enabled": true,
@@ -101,7 +101,86 @@
         "msg": [
           {
             "type": "TEXT",
-            "data": "\nints: Seq[Int] \u003d List()\n\nints: Seq[Int] \u003d List(1)\n\nintsDS: org.apache.spark.sql.Dataset[Int] \u003d [value: int]\n+-----+\n|value|\n+-----+\n|    1|\n+-----+\n\r\n"
+            "data": "\ndata: org.apache.spark.sql.Dataset[Pixel] \u003d [r: int, g: int ... 1 more field]\n+---+---+---+\n|  r|  g|  b|\n+---+---+---+\n| 15| 36| 63|\n| 14| 35| 62|\n| 14| 34| 59|\n| 14| 34| 59|\n| 14| 35| 57|\n| 14| 35| 57|\n| 13| 34| 55|\n| 12| 33| 54|\n| 14| 35| 56|\n| 13| 34| 55|\n| 12| 33| 54|\n| 13| 34| 55|\n| 13| 34| 55|\n| 12| 33| 54|\n| 10| 31| 52|\n|  8| 29| 50|\n|  7| 30| 52|\n|  9| 32| 54|\n|  9| 31| 56|\n|  8| 30| 55|\n+---+---+---+\nonly showing top 20 rows\n\r\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1504554974265_1282417332",
+      "id": "20170904-155614_2001123738",
+      "dateCreated": "Sep 4, 2017 3:56:14 PM",
+      "dateStarted": "Sep 10, 2017 11:13:35 PM",
+      "dateFinished": "Sep 10, 2017 11:14:34 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "val combined \u003d data.map( el \u003d\u003e { Integer.toString(el.r) + Integer.toString(el.g) + Integer.toString(el.b)}).as(\"hex\")\nval freq \u003d combined.groupBy(\"value\").count()\n\nfreq.registerTempTable(\"frequency\")\n",
+      "user": "anonymous",
+      "dateUpdated": "Sep 10, 2017 11:20:40 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "\ncombined: org.apache.spark.sql.Dataset[String] \u003d [value: string]\n\nfreq: org.apache.spark.sql.DataFrame \u003d [value: string, count: bigint]\n\nwarning: there was one deprecation warning; re-run with -deprecation for details\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1504558227284_-1779031908",
+      "id": "20170904-165027_1104190184",
+      "dateCreated": "Sep 4, 2017 4:50:27 PM",
+      "dateStarted": "Sep 10, 2017 11:20:40 PM",
+      "dateFinished": "Sep 10, 2017 11:20:41 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\nselect * from frequency",
+      "user": "anonymous",
+      "dateUpdated": "Sep 10, 2017 11:21:52 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 300.0,
+              "optionOpen": false
+            },
+            "helium": {}
+          }
+        },
+        "editorSetting": {
+          "language": "sql"
+        },
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "value\tcount\n193362\t3\n142039\t23\n657079\t12\n1045726\t2\n194280\t1\n333950\t7\n969690\t3\n253045\t5\n245286\t6\n93964\t1\n154770\t1\n949183\t1\n788392\t5\n956137\t2\n205075\t3\n163768\t10\n245586\t1\n164883\t10\n144982\t4\n809195\t2\n728093\t1\n724427\t1\n784525\t4\n193548\t1\n677989\t1\n636474\t8\n485766\t1\n915123\t1\n287099\t13\n-59-71-83\t1\n161622\t1\n315585\t2\n-93-124111\t3\n824118\t1\n-38-65-92\t1\n-96-106-90\t1\n1109275\t1\n-101-100-96\t1\n126-102-68\t1\n-70-80-90\t1\n927169\t1\n121-96-88\t1\n1218774\t1\n816975\t2\n113-111-98\t1\n797269\t1\n-95-127106\t1\n331923\t2\n-123-63-17\t1\n109-113-90\t1\n122-106-105\t1\n573020\t1\n1279778\t1\n815757\t1\n106-103-65\t1\n112-104-92\t1\n767382\t3\n1245914\t5\n3076117\t3\n3588125\t4\n-92-116112\t1\n4080109\t3\n424560\t1\n573726\t1\n706979\t10\n232238\t1\n4485108\t21\n605969\t5\n865736\t3\n1056432\t6\n1176528\t5\n93-101-61\t1\n104119111\t1\n98-97-57\t2\n-110-114-109\t1\n-49-22-8\t1\n4883116\t1\n93-99-58\t1\n117-70-43\t2\n81-121-80\t1\n75105100\t1\n503942\t1\n68108127\t1\n123-61-43\t2\n795837\t2\n69118-106\t3\n-92-109120\t1\n654942\t2\n81-112-68\t2\n3690125\t1\n-48-4-3\t1\n120-59-27\t1\n-108-39-19\t1\n107-100-84\t1\n62117-96\t1\n120-65-31\t1\n78-106-82\t1\n93877\t2\n-78-60-37\t1\n4982102\t1\n206495\t7\n-43-1-18\t1\n104-93-53\t2\n101-112-93\t1\n-41-1-10\t1\n92-93-49\t3\n108-85-57\t1\n55122-107\t1\n-38-3-1\t1\n302933\t2\n353436\t1\n92-100-66\t1\n62111-113\t1\n-122-73-71\t1\n-123-63-51\t1\n346181\t1\n101-90-59\t3\n-82-52-23\t1\n105-86-48\t1\n65122-103\t1\n66118-102\t1\n467\t2\n-75-32-11\t1\n926539\t1\n222631\t1\n119-49-9\t1\n67109-112\t1\n3414\t4\n71118-111\t1\n92-97-58\t2\n-33-1-5\t1\n112-46-16\t1\n67121122\t1\n125-62-43\t1\n-84-48-24\t1\n109-68-41\t1\n-53-4-1\t1\n116-78-70\t1\n778690\t8\n976032\t5\n183967\t19\n133265\t12\n113864\t6\n535758\t1\n1029481\t1\n143261\t13\n205490\t6\n173150\t1\n353846\t1\n175095\t15\n151529\t61\n547376\t2\n165194\t22\n325482\t12\n313137\t2\n31330\t2\n01728\t1\n784323\t2\n-58-87-114\t2\n-76-107126\t1\n-96-77-34\t1\n3268108\t1\n132535\t1\n1179681\t1\n-89-96-99\t1\n-59-70-74\t1\n1179479\t1\n1099082\t1\n90103117\t1\n-72-80-87\t1\n-38-68-93\t1\n-98-96-95\t1\n-83-95-95\t1\n1069391\t1\n-23-31-44\t1\n275994\t2\n907775\t1\n185396\t12\n-46-70-100\t1\n3176113\t8\n2979107\t6\n715758\t3\n112117120\t1\n-109-110-101\t1\n104-108-79\t1\n1007265\t1\n-16-9-24\t1\n767584\t3\n121123124\t1\n2776114\t10\n-60-53-38\t1\n392226\t1\n78125-87\t1\n533943\t3\n93-126-106\t1\n233749\t2\n1229984\t1\n624536\t2\n71107-113\t1\n4178104\t7\n-105-70-27\t1\n626373\t4\n-92-36-17\t1\n-122-66-49\t2\n75120-98\t1\n-122-50-16\t1\n21645\t4\n-112-44-25\t1\n725340\t2\n7992108\t1\n55111-110\t1\n109-65-30\t1\n113-70-38\t2\n473432\t1\n84-102-62\t1\n1016940\t4\n-123-64-49\t1\n86-95-49\t1\n-74-63-43\t1\n695243\t1\n119-91-80\t1\n-79-61-60\t1\n-123-50-1\t1\n93-89-65\t1\n120-67-50\t1\n2110\t1\n1177235\t4\n-61-17-18\t1\n-81-81-87\t1\n-128-85-98\t1\n122-63-36\t2\n123-59-35\t1\n127-72-63\t1\n79-118-79\t1\n-110-42-23\t1\n-127-75-58\t1\n58105-123\t1\n-126-83-62\t1\n103-96-81\t1\n715647\t1\n343337\t1\n645444\t3\n282134\t2\n103-94-68\t1\n-95-50-39\t1\n11313\t1\n175256\t1\n5523\t1\n63566\t2\n63117-108\t1\n84-110-94\t1\n-81-37-30\t1\n377494\t3\n98-90-53\t3\n63105-122\t2\n326483\t2\n5790110\t1\n110-74-40\t2\n-93-62-31\t1\n336479\t3\n90-105-91\t1\n96-80-43\t1\n104-75-29\t2\n-125-64-62\t1\n-63-20-5\t1\n3015\t1\n02018\t1\n-115-30-22\t1\n-99-46-19\t1\n115-84-75\t1\n06083\t1\n02334\t1\n-117-33-7\t1\n80120-107\t1\n404762\t5\n636980\t9\n626875\t7\n575969\t7\n976738\t3\n245489\t8\n-127534\t11\n185093\t6\n295077\t2\n282737\t19\n687888\t1\n155191\t17\n262836\t9\n11610395\t1\n-44-69-89\t1\n744427\t1\n2059104\t1\n395153\t1\n305686\t14\n164479\t5\n613725\t3\n-22-52-69\t1\n302429\t16\n453125\t1\n292229\t37\n2778110\t8\n12710086\t1\n957368\t1\n1129385\t3\n-59-71-75\t1\n1089593\t2\n-85-86-90\t1\n2575103\t2\n916964\t1\n61529\t1\n181425\t34\n81125\t60\n1014510\t1\n806972\t1\n1067763\t1\n665155\t2\n562718\t1\n554545\t2\n103-120-117\t1\n1095721\t1\n757680\t3\n182126\t1\n664946\t1\n3273112\t2\n322925\t1\n88111-100\t1\n-105-98-95\t1\n676977\t12\n-1266822\t1\n122-108-84\t1\n-25-33-33\t1\n-127-80-58\t3\n423746\t3\n63101119\t1\n102-89-50\t2\n98-103-60\t1\n737585\t1\n185795\t11\n3479122\t1\n-112-62-42\t1\n97-88-51\t1\n70119-97\t2\n293432\t1\n92-116-88\t1\n6791113\t1\n127-59-29\t2\n-125-61-43\t1\n-116-58-46\t1\n114882\t1\n-37-34-36\t1\n457282\t1\n89-96-46\t1\n-54-2-2\t5\n68120-90\t4\n132936\t2\n127-56-28\t2\n-80-34-27\t3\n301627\t3\n283237\t1\n-77-13-1\t1\n-111-65-47\t1\n69123-108\t2\n-117-55-17\t1\n116-75-54\t1\n-77-31-20\t1\n-36-2-2\t2\n365667\t1\n594840\t5\n-81-27-10\t1\n946943\t1\n306285\t2\n88-100-65\t5\n78-123-96\t1\n-118-65-55\t1\n-118-76-71\t1\n123-40-7\t1\n5687102\t1\n-104-90-61\t1\n75-128-95\t1\n67106121\t1\n-111-49-43\t1\n-83-33-15\t1\n93-84-41\t1\n56102-120\t1\n-115-56-36\t1\n110-81-36\t1\n116-72-43\t1\n74112-114\t1\n143862\t1\n565866\t1\n1059074\t1\n1025527\t1\n153467\t1\n956538\t3\n313748\t4\n1029887\t2\n71532\t5\n61029\t17\n1019376\t2\n164266\t6\n104065\t1\n213460\t5\n454856\t2\n979081\t1\n232837\t5\n935935\t7\n185196\t15\n155094\t15\n195791\t6\n175099\t1\n334158\t17\n546880\t1\n758694\t2\n375359\t1\n233343\t1\n514742\t1\n-81-95-101\t1\n533524\t1\n-51-83-106\t1\n-11710990\t1\n-107-75-34\t1\n-114-77-39\t1\n-113-97-74\t1\n-34-48-42\t1\n3475107\t5\n109-112-79\t1\n1089692\t3\n119-96-87\t1\n968276\t1\n0126\t2\n817269\t1\n452220\t1\n-1269781\t1\n776970\t6\n174274\t4\n1249378\t1\n814319\t1\n1067867\t1\n663619\t1\n1145817\t1\n118-124-125\t1\n222131\t23\n1068064\t1\n4384109\t19\n185288\t13\n110117114\t1\n-12311291\t1\n82113-112\t2\n83124-123\t1\n86126-72\t1\n494050\t10\n676670\t2\n77106113\t1\n-123-64-38\t1\n92-114-68\t1\n92-115-71\t1\n98-118-113\t1\n0836\t3\n22154\t8\n79114-109\t2\n1226625\t1\n106-88-52\t1\n-109-62-31\t1\n92-103-63\t3\n474656\t5\n-113-69-52\t1\n-106-39-8\t1\n825836\t4\n7616\t112\n-116-69-42\t1\n3583125\t1\n-106-34-10\t1\n4279101\t5\n83-119-86\t1\n-127-65-47\t1\n-85-37-19\t1\n100-80-44\t1\n4090118\t3\n123-57-28\t1\n978168\t1\n79-113-65\t2\n347199\t1\n302919\t1\n-55-1-4\t1\n102-91-53\t1\n108-94-83\t1\n-107-59-53\t1\n997547\t2\n-64-8-7\t1\n126-56-28\t1\n-116-40-4\t1\n407797\t3\n106-85-64\t3\n94-98-57\t1\n354644\t1\n119-78-68\t1\n69-127-81\t1\n-77-56-35\t1\n141922\t1\n113-69-33\t1\n98-92-73\t1\n-79-36-17\t1\n111-73-26\t1\n-57-19-15\t1\n-122-73-51\t2\n95589\t1\n56109-104\t1\n75-123-81\t1\n625038\t1\n56113-104\t1\n594638\t2\n675037\t1\n110-56-21\t1\n94-92-52\t1\n-4-1-5\t1\n-73-50-18\t1\n326884\t3\n687179\t21\n313343\t67\n1018366\t2\n102141\t4\n225182\t11\n192342\t5\n202338\t11\n374048\t1\n485368\t2\n877662\t1\n123364\t4\n234066\t10\n754526\t5\n556680\t2\n496369\t2\n834624\t1\n584340\t2\n305055\t1\n405460\t2\n372936\t25\n1169792\t2\n403242\t7\n874215\t1\n362932\t6\n-53-70-73\t1\n3076107\t4\n1038267\t1\n-66-78-80\t1\n-81-89-88\t1\n-35-64-91\t1\n1129483\t1\n1129183\t1\n-11710592\t1\n-51-90-112\t1\n-92-92-92\t1\n171625\t6\n7599123\t1\n111042\t1\n826556\t1\n124123-124\t1\n3782109\t7\n867986\t2\n3386123\t2\n625056\t3\n4880116\t1\n-104-104-90\t1\n32757\t4\n101-121-108\t1\n101-93-63\t2\n5496-107\t1\n96-125-111\t1\n82111-106\t1\n3183119\t3\n118-80-51\t1\n113-99-70\t1\n83123-108\t1\n453430\t1\n315480\t1\n99-128125\t1\n87127-77\t1\n161426\t3\n795964\t1\n74-118-88\t1\n-115-75-27\t1\n846463\t1\n-99-55-32\t1\n4790117\t7\n-113-63-41\t2\n121-85-63\t1\n495358\t1\n97-81-52\t2\n211419\t1\n64116-100\t3\n77121-104\t1\n866563\t1\n221518\t1\n-82-66-43\t1\n-78-64-42\t1\n-120-47-15\t1\n-126-92-68\t1\n76-109-76\t1\n-93-63-36\t1\n-67-22-9\t1\n72-114-90\t1\n106-84-66\t1\n62110-110\t1\n94-89-67\t1\n126-82-64\t2\n613\t1\n392945\t1\n126-66-41\t1\n-125-70-57\t1\n-67-1-2\t1\n-64-17-9\t1\n-53-4-2\t1\n-40-2-1\t3\n497393\t1\n125-88-73\t1\n-92-47-36\t1\n-71-4-7\t1\n01111\t1\n72123-101\t1\n103243\t1\n101-98-73\t1\n-109-54-45\t2\n-41-1-6\t1\n64123-87\t2\n-21-1-3\t1\n102-75-36\t1\n79-112-61\t1\n90-99-66\t2\n-87-61-21\t1\n69115-117\t1\n-118-34-6\t1\n-85-13-5\t1\n-90-45-34\t1\n115089\t4\n101-85-45\t2\n-82-27-18\t1\n-120-28-3\t1\n-65-5-1\t1\n84-98-56\t1\n95390\t1\n96-86-50\t1\n173160\t12\n1105216\t4\n253142\t10\n888882\t2\n965931\t2\n303445\t15\n142547\t27\n174383\t4\n174685\t6\n1016333\t4\n788491\t5\n144469\t6\n83065\t13\n917967\t2\n817776\t4\n787372\t3\n835128\t2\n905325\t1\n465370\t1\n486070\t1\n526466\t1\n154488\t3\n375157\t1\n-14-48-77\t1\n964513\t2\n807370\t1\n-21-46-56\t1\n151527\t51\n714122\t1\n1425\t3\n205398\t1\n163463\t6\n123-127-114\t1\n383544\t4\n452623\t2\n573016\t1\n3878103\t2\n1058678\t2\n124-92-57\t1\n-23-47-71\t1\n1138470\t2\n7829\t1\n988478\t1\n117-112-98\t1\n947469\t2\n-126-86-51\t1\n120-122-110\t1\n119-107-96\t1\n123-124-114\t1\n877777\t2\n62755\t3\n41846\t9\n866458\t2\n695860\t1\n115-84-45\t1\n452422\t2\n22049\t17\n643923\t1\n78111-95\t1\n95125-120\t1\n-65-62-54\t1\n114-114-114\t1\n75107-113\t1\n6095-117\t1\n5681107\t1\n484047\t10\n83-114-74\t1\n66108-125\t1\n222130\t11\n107-102-81\t1\n-106-38-9\t1\n373737\t1\n3584122\t1\n3685125\t3\n4180102\t11\n-119-46-16\t1\n282118\t1\n-120-37-5\t1\n-52-75-107\t1\n876462\t2\n90-99-60\t1\n-123-82-60\t2\n-13-1-12\t1\n-19-1-9\t1\n101-86-37\t1\n-40-3-7\t1\n124-74-39\t1\n-84-41-26\t2\n475253\t1\n151117\t2\n68118-92\t1\n91-99-50\t1\n226598\t34\n73120-105\t2\n91413\t1\n392942\t1\n2674102\t6\n-25-4-2\t1\n477683\t1\n76-117-83\t2\n-5-2-1\t3\n407692\t1\n-85-64-33\t1\n87-119-96\t1\n-94-60-31\t2\n96-95-64\t1\n102-72-24\t1\n-112-67-56\t1\n316888\t1\n413637\t1\n-72-7-1\t1\n-99-13-7\t1\n-102-50-38\t1\n275978\t1\n108-60-13\t1\n1126831\t1\n82-115-69\t1\n110-89-58\t1\n113-71-24\t1\n-4-1-3\t2\n-76-17-1\t1\n96-83-57\t1\n-124-60-49\t1\n113063\t14\n182959\t5\n162245\t3\n51031\t8\n424861\t3\n717784\t10\n394149\t9\n666868\t3\n10510190\t1\n988162\t2\n1005625\t1\n91331\t124\n818278\t1\n997349\t1\n485770\t35\n525974\t4\n205694\t17\n1066233\t2\n829194\t3\n908477\t2\n71136\t7\n183764\t7\n236195\t15\n134793\t2\n869598\t9\n905327\t3\n524548\t3\n413638\t17\n11410399\t1\n543831\t2\n2163106\t1\n-20-41-49\t1\n2672103\t9\n337398\t4\n347597\t1\n937564\t1\n-101119101\t1\n-121-123-111\t2\n816860\t1\n8824\t79\n41241\t4\n141322\t15\n574740\t4\n1418\t2\n-46-64-87\t1\n786672\t2\n-127125-125\t1\n583736\t1\n303538\t1\n109-115-109\t1\n816058\t3\n-65-67-55\t1\n108-119-122\t1\n696872\t6\n102-120-121\t1\n108119117\t1\n595060\t3\n676368\t3\n-91-91-75\t1\n1116224\t3\n78124-84\t1\n89119-110\t1\n0314\t1\n0013\t2\n-85-70-61\t2\n141021\t76\n-118-58-36\t1\n3687120\t2\n-117-51-16\t1\n4585114\t1\n126-57-29\t1\n684941\t2\n117-66-38\t1\n322827\t1\n6996122\t1\n367094\t1\n123-63-34\t1\n437696\t3\n-44-3-1\t5\n-111-66-39\t1\n-99-54-40\t1\n-70-100-117\t1\n-118-75-48\t1\n13512\t1\n202835\t1\n116-79-45\t1\n-80-92-92\t1\n68-126-80\t1\n86-108-72\t1\n73-126-94\t1\n83-105-60\t1\n79-126-94\t1\n-65-21-8\t2\n-84-56-32\t1\n-120-53-32\t1\n-74-52-40\t1\n5481101\t1\n103-86-63\t1\n-69-12-15\t1\n326281\t4\n-63-10-7\t1\n122426\t1\n125-73-51\t1\n-101-66-70\t1\n1137233\t2\n-127-57-28\t1\n2572100\t4\n625048\t1\n-82-3-1\t1\n-118-40-3\t1\n-84-35-37\t1\n98-83-45\t1\n76123-105\t2\n89-98-58\t1\n-113-39-13\t1\n-57-17-12\t1\n111-97-85\t1\n64112-110\t1\n-122-58-23\t1\n94-108-85\t1\n65113-109\t1\n123-76-44\t1\n124-78-61\t1\n-82-42-37\t1\n133455\t14\n748387\t13\n10410294\t2\n1079682\t2\n465368\t6\n956952\t2\n113456\t6\n184272\t2\n1085217\t2\n10510393\t3\n414962\t6\n323647\t3\n255387\t5\n384146\t6\n968063\t1\n165381\t1\n928887\t1\n266083\t1\n93571\t3\n857972\t1\n276288\t1\n212133\t40\n776450\t1\n244370\t26\n101742\t12\n246598\t38\n674736\t1\n175286\t12\n696461\t1\n555052\t2\n935325\t2\n446066\t2\n174690\t4\n41438\t119\n964715\t1\n122037\t6\n322729\t8\n3578105\t8\n754118\t1\n224273\t3\n773915\t3\n-54-82-106\t1\n-99-68-37\t2\n492519\t1\n532616\t4\n119-104-84\t1\n968073\t4\n-90-95-96\t1\n316196\t1\n685654\t1\n302232\t6\n723612\t3\n41229\t1\n433437\t5\n483636\t1\n31027\t1\n-68-96-126\t2\n153969\t1\n104-111-72\t1\n683519\t1\n-1-2-16\t1\n85122-106\t1\n624854\t4\n111122126\t1\n675152\t1\n708899\t1\n122-121-119\t1\n52866\t1\n58112-83\t1\n3082118\t6\n82-128-80\t1\n-77-76-62\t1\n-74-95-123\t1\n114-108-108\t1\n123-73-43\t2\n97-100-54\t1\n118125-116\t1\n463747\t3\n-33-43-61\t1\n96-94-53\t1\n91-101-60\t1\n-115-49-14\t1\n-122-61-27\t1\n79-121-74\t1\n-93-44-18\t1\n-105-120117\t1\n-97-67-50\t1\n106-74-38\t1\n4390121\t1\n83-106-61\t1\n125085\t12\n-8-1-8\t1\n81-108-69\t3\n125-54-28\t1\n106-87-73\t1\n122-87-79\t1\n71127-80\t1\n-101-56-42\t2\n423931\t1\n-67-77-77\t1\n-88-49-65\t1\n74079\t1\n-35-1-1\t2\n14613\t1\n-53-5-4\t2\n-42-1-11\t1\n4685113\t1\n-56-4-4\t1\n5696115\t1\n-78-11-1\t1\n-81-39-26\t1\n81-104-60\t1\n836973\t1\n\u003c!--TABLE_COMMENT--\u003e\n\u003cfont color\u003dred\u003eResults are limited by 1000.\u003c/font\u003e"
           }
         ]
       },
@@ -109,8 +188,8 @@
       "jobName": "paragraph_1504378895515_252431714",
       "id": "20170902-150135_861879847",
       "dateCreated": "Sep 2, 2017 3:01:35 PM",
-      "dateStarted": "Sep 4, 2017 3:56:59 PM",
-      "dateFinished": "Sep 4, 2017 3:57:00 PM",
+      "dateStarted": "Sep 10, 2017 11:20:45 PM",
+      "dateFinished": "Sep 10, 2017 11:20:50 PM",
       "status": "FINISHED",
       "progressUpdateIntervalMs": 500
     },
@@ -122,9 +201,9 @@
         "forms": {}
       },
       "apps": [],
-      "jobName": "paragraph_1504554974265_1282417332",
-      "id": "20170904-155614_2001123738",
-      "dateCreated": "Sep 4, 2017 3:56:14 PM",
+      "jobName": "paragraph_1505013587489_-694830756",
+      "id": "20170909-231947_1031461249",
+      "dateCreated": "Sep 9, 2017 11:19:47 PM",
       "status": "READY",
       "progressUpdateIntervalMs": 500
     }
